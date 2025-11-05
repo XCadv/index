@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>满屏爱心 ❤️</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(255, 105, 180, 0.15), transparent 60%),
+                radial-gradient(1200px 600px at 80% -10%, rgba(255, 105, 180, 0.15), transparent 60%),
+                #0a0a12;
+    user-select: none;
+  }
+  .message {
+    position: fixed;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-family: "Arial", sans-serif;
+    font-size: 24px;
+    text-align: center;
+    width: 90%;
+    z-index: 100;
+    opacity: 0;
+    animation: fade 8s infinite;
+    text-shadow: 0 0 12px rgba(255, 105, 180, 0.8);
+  }
+  @keyframes fade {
+    0% { opacity: 0; transform: translate(-50%, -40px); }
+    10% { opacity: 1; transform: translate(-50%, -50%); }
+    90% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -60px); }
+  }
+  .music-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffc0cb;
+    font-size: 14px;
+    opacity: 0.8;
+    z-index: 99;
+  }
+  .click-text {
+    position: fixed;
+    color: #ff69b4;
+    font-size: 18px;
+    font-weight: bold;
+    z-index: 90;
+    animation: float 1.5s forwards;
+    pointer-events: none;
+  }
+  @keyframes float {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-40px); }
+  }
+</style>
+</head>
+<body>
+<audio id="bgm" src="https://cdn.jsdelivr.net/gh/wangxf19970505/music/mp3/%E6%8A%96%E9%9F%B3%E6%AD%8C%E6%9B%B2/%E5%91%80%E5%91%80%E5%91%80%20-%20%E5%96%9C%E6%AD%8C%E6%9B%B2%20%28%E6%97%A0%E8%AF%AD%E8%A8%80%20Remix%29.mp3" autoplay loop></audio>
+<div class="music-hint">🎵 背景音乐已自动播放</div>
+<div class="message" id="msg"></div>
+<script>
+const NAME = "亲爱的"; // 在这里改你想显示的名字
+
+const messages = [
+  `遇见你，是我一生的幸运`,
+  `愿往后的日子，都是你我相伴`,
+  `你是我生命里的光`,
+  `爱你，不止今天，而是每一天`,
+  `往后余生，皆是你`,
+  `我的世界因你而完整`,
+  `想和你一起，看遍世间风景`,
+  `你在，便是心安`,
+  `喜欢你，是我做过最对的事`,
+  `有你在身边，每天都是情人节`
+].map(str => str.replace(/你/g, NAME));
+
+document.title = `${NAME}，我爱你 ❤️`;
+
+function setRandomMessage() {
+  const msg = messages[Math.floor(Math.random() * messages.length)];
+  document.getElementById('msg').textContent = msg;
+}
+setRandomMessage();
+setInterval(setRandomMessage, 8000);
+
+function createHeart(x, y, size, color) {
+  const heart = document.createElement('div');
+  heart.style.position = 'fixed';
+  heart.style.left = x + 'px';
+  heart.style.top = y + 'px';
+  heart.style.width = size + 'px';
+  heart.style.height = size + 'px';
+  heart.style.backgroundColor = color;
+  heart.style.transform = 'rotate(45deg)';
+  heart.style.opacity = '0.9';
+  heart.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.5)';
+  document.body.appendChild(heart);
+  return heart;
+}
+
+function animateHeart(heart) {
+  let x = parseFloat(heart.style.left);
+  let y = parseFloat(heart.style.top);
+  const size = parseFloat(heart.style.width);
+  const speed = (Math.random() - 0.5) * 2;
+  const fall = Math.random() * 1.5 + 0.5;
+  function move() {
+    x += speed;
+    y += fall;
+    heart.style.left = x + 'px';
+    heart.style.top = y + 'px';
+    heart.style.opacity = (1 - y / window.innerHeight) + '';
+    if (y < window.innerHeight + 50) requestAnimationFrame(move);
+    else heart.remove();
+  }
+  move();
+}
+
+function spawnHeart() {
+  const size = Math.random() * 16 + 8;
+  const x = Math.random() * window.innerWidth;
+  const y = -20;
+  const hue = Math.random() * 40 + 330; // 粉色到红色
+  const color = `hsl(${hue}, 100%, 65%)`;
+  const heart = createHeart(x, y, size, color);
+  animateHeart(heart);
+}
+
+setInterval(spawnHeart, 120);
+
+// 点击屏幕额外飘爱心 + 文字
+document.addEventListener('touchstart', (e) => {
+  const x = e.touches[0].clientX;
+  const y = e.touches[0].clientY;
+  for (let i = 0; i < 15; i++) {
+    const size = Math.random() * 14 + 6;
+    const hue = Math.random() * 40 + 330;
+    const color = `hsl(${hue}, 100%, 65%)`;
+    const heart = createHeart(x, y, size, color);
+    heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+    animateHeart(heart);
+  }
+
+  const text = document.createElement('div');
+  text.className = 'click-text';
+  text.textContent = Math.random() > 0.5 ? 'Love You' : '❤️';
+  text.style.left = (x - 30) + 'px';
+  text.style.top = (y - 20) + 'px';
+  document.body.appendChild(text);
+  setTimeout(() => text.remove(), 1500);
+});
+
+// 自动播放音乐（有些浏览器需要用户交互后才能播放）
+document.addEventListener('touchstart', () => {
+  const audio = document.getElementById('bgm');
+  if (audio.paused) audio.play().catch(() => {});
+}, { once: true });
+</script>
+</body>
+</html>
